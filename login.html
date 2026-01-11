@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Google Auth</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gray-50 flex items-center justify-center h-screen" x-data="authHandler()">
+    
+    <div class="bg-white p-8 rounded-xl shadow-md w-96 text-center">
+        <h2 class="text-2xl font-bold mb-6">Login</h2>
+        
+        <button 
+            @click="loginWithGoogle"
+            :disabled="loading"
+            class="flex items-center justify-center w-full border border-gray-300 py-2 rounded-lg hover:bg-gray-100 transition disabled:opacity-50">
+            <span x-show="!loading" class="flex items-center">
+                <img src="https://www.svgrepo.com/show/355037/google.svg" class="w-5 h-5 mr-2">
+                Masuk dengan Google
+            </span>
+            <span x-show="loading">Harap tunggu...</span>
+        </button>
+
+        <p x-show="errorMessage" x-text="errorMessage" class="mt-4 text-red-500 text-sm"></p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAspWLBGshZqEgpGPKQAcpQ5Zp_PzMwI2A",
+            authDomain: "web-login-app-e0b7d.firebaseapp.com",
+            projectId: "web-login-app-e0b7d",
+            storageBucket: "web-login-app-e0b7d.firebasestorage.app",
+            messagingSenderId: "906196239052",
+            appId: "1:906196239052:web:d29682a15abf9e0ba87869",
+            measurementId: "G-Z0RS42VSW1"
+        };
+
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        window.authHandler = () => ({
+            loading: false,
+            errorMessage: '',
+            async loginWithGoogle() {
+                this.loading = true;
+                try {
+                    const result = await signInWithPopup(auth, provider);
+                    // Simpan status login sederhana di session (opsional)
+                    localStorage.setItem('user', JSON.stringify(result.user));
+                    window.location.href = 'dasbor.html';
+                } catch (error) {
+                    this.errorMessage = "Gagal login: " + error.message;
+                } finally {
+                    this.loading = false;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
